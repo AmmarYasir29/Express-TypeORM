@@ -28,4 +28,16 @@ export default class Validator {
       type: "string",
     }
   })
+  static login=(): any => ({
+        phone: {
+          presence: true,
+          type: "string",
+          length: { maximum: 15, minimum: 10 },
+        },
+        password: {
+          presence: true,
+          type: "string",
+          length: { maximum: 15, minimum: 4 },
+        },
+  })
 }

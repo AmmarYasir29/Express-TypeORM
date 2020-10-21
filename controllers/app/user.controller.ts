@@ -6,6 +6,8 @@ import { User } from "../../src/entity/User";
 import PhoneFormat from "../../helpers/phone.helper";
 import * as jwt from "jsonwebtoken"
 import * as bcrypt from "bcrypt";
+import { Category } from './../../src/entity/Category';
+import { Product } from "../../src/entity/Product";
 /**
  *  any thinge use in ts must download @type   with add to it -d
  * any library that depend on project must add to it -s 
@@ -24,10 +26,10 @@ export default class UserController {
     if (!phoneObj.isNumber)
       return errRes(res, `Phone ${req.body.phone} is not a valid`);
       let user: any;
-
-    try {
-      user = await User.findOne({ where: { phone: req.body.phone } });
-      if (user) return errRes(res, `Phone ${req.body.phone} already exists`);
+      
+      try {
+        user = await User.findOne({ where: { phone: req.body.phone } });
+        if (user) return errRes(res, `Phone ${req.body.phone} already exists`);
     } catch (error) {
       return errRes(res, error);
     }
@@ -74,4 +76,37 @@ export default class UserController {
     await user.save();
     return okRes(res,user);
   }
-}
+  static async Login(req,res) {
+      let isValid = validate(req.body,validation.login());
+      if(isValid) return errRes(res,isValid,404);
+
+      let user = await User.findOne({ where: { phone: req.body.phone } });
+      if(!user) return errRes(res,"user not found");
+      
+      // if(user.complete === false) return errRes(res,"complite the process");
+      
+      let validPass= bcrypt.compare(req.body.password, user.password); 
+      if(!validPass) return errRes(res,"data not correct");
+      let token= jwt.sign({data: user.id}, '12345', { expiresIn: '1h' });
+      return okRes(res,token);
+    }
+    
+    static category(req,res) {
+      try {
+        //FIXME: dont show any data from DB
+        let data = Category.find({ where: {active:true},relations: ["products"] });
+        return okRes(res,data);
+      } catch (error) {
+        errRes(res,error)
+      }
+    }
+    static products(req,res) {
+      try {
+        let data = Product.find({ where: {active:true,id:req.params.id},relations: ["category"] });
+        return okRes(res,data);
+      } catch (error) {
+        errRes(res,error)
+      }      
+    }
+  }
+  
