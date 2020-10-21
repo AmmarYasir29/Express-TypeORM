@@ -40,4 +40,16 @@ export default class Validator {
           length: { maximum: 15, minimum: 4 },
         },
   })
+  static pass=(): any => ({
+        phone: {
+          presence: true,
+          type: "string",
+          length: { maximum: 15, minimum: 10 },
+        },
+        newPassword: {
+          presence: true,
+          type: "string",
+          length: { maximum: 15, minimum: 4 },
+        },
+  })
 }

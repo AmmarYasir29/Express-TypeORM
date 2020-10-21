@@ -13,9 +13,15 @@ router.post("/login",UserController.Login)
 //// categories
 router.get("/categories",UserController.category)
 //// category products
-router.get("/products",UserController.products)
+router.get("/products:id",UserController.products)
 //// invoices
 //// methods
 //// notifications
 
+/**
+ * 
+ * forget password
+ * 
+ */
+router.put("/forget",UserController.forgetPasswprd)
 export default router;

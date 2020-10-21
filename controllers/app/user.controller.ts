@@ -14,6 +14,33 @@ import { Product } from "../../src/entity/Product";
  * 
  */
 export default class UserController {
+    static async forgetPasswprd(req,res) {
+      /**
+       * check the number if valid
+       * check the number if not in DB
+       * 
+       */
+    let isValid = validate(req.body,validation.pass())
+    if(isValid) return errRes(res,isValid);
+    
+    let user:any
+    try {
+      user = await User.findOne({ where: { phone: req.body.phone } });
+      if(!user) return errRes(res,"the user not found regester first!")  
+    } catch (error) {
+      return errRes(res,error)      
+    }
+    //TODO: send sms with ome code 
+    /////// check the code if the same
+    /////// chnge the password
+    
+    const salt = await bcrypt.genSalt(10);
+    const password = await bcrypt.hash(req.body.newPassword, salt);    
+    //Store hash in your password DB.
+    user.password= password;
+    await user.save();
+    return okRes(res,user);
+    }
   /**
    *
    * @param req
@@ -91,18 +118,17 @@ export default class UserController {
       return okRes(res,token);
     }
     
-    static category(req,res) {
+    static async category(req,res) {
       try {
-        //FIXME: dont show any data from DB
-        let data = Category.find({ where: {active:true},relations: ["products"] });
+        let data = await Category.find({ where: {active:true},relations: ["products"] });
         return okRes(res,data);
       } catch (error) {
         errRes(res,error)
       }
     }
-    static products(req,res) {
+    static async products(req,res) {
       try {
-        let data = Product.find({ where: {active:true,id:req.params.id},relations: ["category"] });
+        let data = await Product.find({ where: {active:true,id:req.params.id},relations: ["category"] });
         return okRes(res,data);
       } catch (error) {
         errRes(res,error)
