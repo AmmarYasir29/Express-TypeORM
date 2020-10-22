@@ -18,10 +18,8 @@ router.get("/products:id",UserController.products)
 //// methods
 //// notifications
 
-/**
- * 
- * forget password
- * 
- */
+// forget password
 router.put("/forget",UserController.forgetPasswprd)
+// updata data
+router.put("/update",UserController.update)
 export default router;

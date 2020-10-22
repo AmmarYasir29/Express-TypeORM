@@ -2,6 +2,21 @@
  *
  */
 export default class Validator {
+  static update = ():any => ({
+    name: {
+      type: "string",
+    },
+    phone: {
+      presence: true,
+      type: "string",
+      length: { maximum: 15, minimum: 10 },
+    },
+    password: {
+      type: "string",
+      length: { maximum: 15, minimum: 4 },
+    },
+  
+  })
   /**
    *
    * @param must: boolean

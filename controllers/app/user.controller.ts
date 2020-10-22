@@ -14,6 +14,28 @@ import { Product } from "../../src/entity/Product";
  * 
  */
 export default class UserController {
+    
+  static async update(req:Request,res:Response) {
+  const isValid = validate(req.body, validation.update());
+  if (isValid) return errRes(res, isValid);
+  
+  let user:any
+  user= await User.findOne( {where:{phone:req.body.phone}});
+  
+  if(!user) return errRes(res,"the user not found regester firs!")
+  
+  Object.keys(req.body).forEach((key) => (user[key] = req.body[key]));
+  
+  await user.save();
+  console.log(user);
+  //FIXME: not work, send user as object
+  return okRes(res,`${user} user is Updata`)
+}
+    /**
+     * 
+     * @param req 
+     * @param res 
+     */
     static async forgetPasswprd(req,res) {
       /**
        * check the number if valid
@@ -26,10 +48,11 @@ export default class UserController {
     let user:any
     try {
       user = await User.findOne({ where: { phone: req.body.phone } });
-      if(!user) return errRes(res,"the user not found regester first!")  
     } catch (error) {
       return errRes(res,error)      
     }
+    if(!user) return errRes(res,"the user not found regester first!")
+    if(user.password === req.body.password) return errRes(res,"change the password")  
     //TODO: send sms with ome code 
     /////// check the code if the same
     /////// chnge the password
@@ -46,6 +69,7 @@ export default class UserController {
    * @param req
    * @param res
    */
+
   static async register(req: Request, res: Response): Promise<object> {
     let notValid = validate(req.body, validation.register());
     if (notValid) return errRes(res, notValid);
